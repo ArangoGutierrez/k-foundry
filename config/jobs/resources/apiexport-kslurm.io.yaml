@@ -1,0 +1,9 @@
+apiVersion: apis.kcp.io/v1alpha1
+kind: APIExport
+metadata:
+  creationTimestamp: null
+  name: kslurm.io
+spec:
+  latestResourceSchemas:
+  - v240427-57d9c7e.jobs.kslurm.io
+status: {}
