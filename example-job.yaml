@@ -1,0 +1,10 @@
+apiVersion: kslurm.io/v1alpha1
+kind: Job
+metadata:
+  name: example-job
+  namespace: default
+spec:
+  script: |
+    #!/bin/bash
+    echo "Hello, world!"
+status: {}

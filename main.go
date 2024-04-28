@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ArangoGutierrez/k-slurm/controllers/configmap"
 	"github.com/ArangoGutierrez/k-slurm/controllers/job"
 	kcpclienthelper "github.com/kcp-dev/apimachinery/v2/pkg/client"
 	"k8s.io/apimachinery/pkg/types"
@@ -133,10 +132,7 @@ func runController(ctx context.Context, opts Options) error {
 		}
 	}
 
-	// create controllers
-	if err = (&configmap.Reconciler{Client: mgr.GetClient()}).SetupWithManager(mgr); err != nil {
-		return fmt.Errorf("unable to create configmap controller: %w", err)
-	}
+	// create controller
 	if err = (&job.Reconciler{Client: mgr.GetClient()}).SetupWithManager(mgr); err != nil {
 		return fmt.Errorf("unable to create widget controller: %w", err)
 	}
