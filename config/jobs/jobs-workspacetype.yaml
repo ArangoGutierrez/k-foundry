@@ -9,4 +9,4 @@ spec:
       path: root
   defaultAPIBindings:
   - path: root:jobs
-    export: data.my.domain
+    export: kslurm.io
