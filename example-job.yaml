@@ -1,4 +1,4 @@
-apiVersion: kslurm.io/v1alpha1
+apiVersion: kfoundry.io/v1alpha1
 kind: Job
 metadata:
   name: example-job

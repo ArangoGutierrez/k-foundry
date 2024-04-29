@@ -25,7 +25,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/kcp"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	datav1alpha1 "github.com/ArangoGutierrez/k-slurm/apis/v1alpha1"
+	datav1alpha1 "github.com/ArangoGutierrez/k-foundry/apis/v1alpha1"
 )
 
 // Reconciler reconciles a Job object

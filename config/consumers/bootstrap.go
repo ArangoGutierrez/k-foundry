@@ -23,7 +23,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	confighelpers "github.com/ArangoGutierrez/k-slurm/config/helpers"
+	confighelpers "github.com/ArangoGutierrez/k-foundry/config/helpers"
 )
 
 //go:embed *.yaml

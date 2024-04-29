@@ -2,8 +2,8 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIExport
 metadata:
   creationTimestamp: null
-  name: kslurm.io
+  name: kfoundry.io
 spec:
   latestResourceSchemas:
-  - v240427-57d9c7e.jobs.kslurm.io
+  - v240429-088004a.jobs.kfoundry.io
 status: {}

@@ -1,12 +1,12 @@
 apiVersion: tenancy.kcp.io/v1alpha1
 kind: WorkspaceType
 metadata:
-  name: jobs
+  name: cluster
 spec:
   extend:
     with:
     - name: universal
       path: root
   defaultAPIBindings:
-  - path: root:jobs
-    export: kslurm.io
+  - path: root:foundry
+    export: kfoundry.io

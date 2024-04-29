@@ -6,7 +6,7 @@ metadata:
     bootstrap.kcp.io/create-only: "true"
 spec:
   type:
-    name: jobs
+    name: cluster
     path: root
   location:
     selector:

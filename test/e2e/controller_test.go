@@ -31,7 +31,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 
-	datav1alpha1 "github.com/ArangoGutierrez/k-slurm/apis/v1alpha1"
+	datav1alpha1 "github.com/ArangoGutierrez/k-foundry/apis/v1alpha1"
 )
 
 // The tests in this package expect to be called when:

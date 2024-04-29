@@ -2,9 +2,9 @@ apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
   creationTimestamp: null
-  name: v240427-57d9c7e.jobs.kslurm.io
+  name: v240429-088004a.jobs.kfoundry.io
 spec:
-  group: kslurm.io
+  group: kfoundry.io
   names:
     kind: Job
     listKind: JobList

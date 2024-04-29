@@ -1,4 +1,4 @@
-# K-Slurm
+# K-Foundry
 
 ## Getting Started
 

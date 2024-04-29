@@ -1,4 +1,4 @@
-module github.com/ArangoGutierrez/k-slurm
+module github.com/ArangoGutierrez/k-foundry
 
 go 1.21.8
 

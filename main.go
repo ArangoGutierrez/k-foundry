@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ArangoGutierrez/k-slurm/controllers/job"
+	"github.com/ArangoGutierrez/k-foundry/controllers/job"
 	kcpclienthelper "github.com/kcp-dev/apimachinery/v2/pkg/client"
 	"k8s.io/apimachinery/pkg/types"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -34,7 +34,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 
-	datav1alpha1 "github.com/ArangoGutierrez/k-slurm/apis/v1alpha1"
+	datav1alpha1 "github.com/ArangoGutierrez/k-foundry/apis/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -76,7 +76,7 @@ type Options struct {
 
 func (o *Options) addFlags(fs *flag.FlagSet) {
 	fs.StringVar(&o.KubeconfigContext, "context", "", "kubeconfig context")
-	fs.StringVar(&o.APIExportName, "api-export-name", "kslurm.io", "The name of the APIExport.")
+	fs.StringVar(&o.APIExportName, "api-export-name", "kfoundry.io", "The name of the APIExport.")
 	fs.StringVar(&o.MetricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	fs.StringVar(&o.ProbeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	fs.BoolVar(&o.EnableLeaderElection, "leader-elect", false,
@@ -94,7 +94,7 @@ func runController(ctx context.Context, opts Options) error {
 	// of the example. In production, you should use the controller-runtime client loader
 	// to load the kubeconfig file dedicated to workspace where APIExport is located.
 	// restConfig := ctrl.GetConfigOrDie()
-	jobsCluster := logicalcluster.NewPath("root:jobs")
+	jobsCluster := logicalcluster.NewPath("root:foundry")
 	jobsConfig, err := config.GetConfigWithContext("base")
 	if err != nil {
 		return fmt.Errorf("unable to get config: %w", err)
