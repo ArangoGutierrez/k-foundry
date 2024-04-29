@@ -27,7 +27,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/discovery"
-	"k8s.io/client-go/kubernetes/scheme"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
@@ -48,9 +47,9 @@ import (
 )
 
 func init() {
-	utilruntime.Must(clientgoscheme.AddToScheme(scheme.Scheme))
-	utilruntime.Must(datav1alpha1.AddToScheme(scheme.Scheme))
-	utilruntime.Must(apisv1alpha1.AddToScheme(scheme.Scheme))
+	utilruntime.Must(clientgoscheme.AddToScheme(clientgoscheme.Scheme))
+	utilruntime.Must(datav1alpha1.AddToScheme(clientgoscheme.Scheme))
+	utilruntime.Must(apisv1alpha1.AddToScheme(clientgoscheme.Scheme))
 }
 
 func main() {
