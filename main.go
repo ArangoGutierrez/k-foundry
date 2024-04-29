@@ -132,7 +132,10 @@ func runController(ctx context.Context, opts Options) error {
 	}
 
 	// create controller
-	if err = (&job.Reconciler{Client: mgr.GetClient()}).SetupWithManager(mgr); err != nil {
+	if err = (&job.Reconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
 		return fmt.Errorf("unable to create widget controller: %w", err)
 	}
 
@@ -143,8 +146,14 @@ func runController(ctx context.Context, opts Options) error {
 		return fmt.Errorf("unable to set up ready check: %w", err)
 	}
 
-	log.Info("Starting manager")
-	return mgr.Start(ctx)
+	// Register signal handler for SIGINT and SIGTERM to terminate the manager
+	log.Info("starting manager")
+	if err := mgr.Start(ctx); err != nil {
+		log.Error(err, "problem running manager")
+		return err
+	}
+
+	return nil
 }
 
 // restConfigForAPIExport returns a *rest.Config properly configured to communicate with the endpoint for the

@@ -109,8 +109,8 @@ import (
 //
 //	authorizer.group('').resource('pods').subresource('status') // returns a ResourceCheck the 'status' subresource of 'pods'
 //	authorizer.group('apps').resource('deployments').subresource('scale') // returns a ResourceCheck the 'scale' subresource of 'deployments'
-//	authorizer.group('example.com').resource('jobs').subresource('scale') // returns a ResourceCheck for the 'scale' subresource of the 'jobs' custom resource
-//	authorizer.group('example.com').resource('jobs').subresource('') // returns a ResourceCheck for the 'jobs' resource.
+//	authorizer.group('example.com').resource('widgets').subresource('scale') // returns a ResourceCheck for the 'scale' subresource of the 'widgets' custom resource
+//	authorizer.group('example.com').resource('widgets').subresource('') // returns a ResourceCheck for the 'widgets' resource.
 //
 // namespace
 //
@@ -125,7 +125,7 @@ import (
 //
 //	authorizer.group('apps').resource('deployments').namespace('test') // returns a ResourceCheck for 'deployments' in the 'test' namespace
 //	authorizer.group('').resource('pods').namespace('default') // returns a ResourceCheck for 'pods' in the 'default' namespace
-//	authorizer.group('').resource('jobs').namespace('') // returns a ResourceCheck for 'jobs' in the cluster scope
+//	authorizer.group('').resource('widgets').namespace('') // returns a ResourceCheck for 'widgets' in the cluster scope
 //
 // name
 //

@@ -1,7 +1,7 @@
 apiVersion: kfoundry.io/v1alpha1
 kind: Job
 metadata:
-  name: example-job
+  generateName: example-job-
   namespace: default
 spec:
   script: |

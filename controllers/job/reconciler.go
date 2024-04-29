@@ -18,8 +18,11 @@ package job
 
 import (
 	"context"
+	"time"
 
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/kcp"
@@ -30,7 +33,15 @@ import (
 
 // Reconciler reconciles a Job object
 type Reconciler struct {
-	Client client.Client
+	// Client interface to communicate with the API server. Reconciler needs this for
+	// fetching objects.
+	client.Client
+
+	// Scheme is used by the kubebuilder library to set OwnerReferences. Every
+	// controller needs this.
+	Scheme *runtime.Scheme
+
+	Recorder record.EventRecorder
 }
 
 // Reconcile TODO
@@ -56,7 +67,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 			// Normal - was deleted
 			return ctrl.Result{}, nil
 		}
-		return ctrl.Result{}, err
+		return ctrl.Result{Requeue: true}, err
 	}
 
 	log.Info("Listing all Jobs in the current logical cluster")
@@ -69,10 +80,10 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 	orig := w.DeepCopy()
 	w.Status.ID = len(list.Items)
 	if err := r.Client.Status().Patch(ctx, &w, client.MergeFromWithOptions(orig, client.MergeFromWithOptimisticLock{})); err != nil {
-		return ctrl.Result{}, err
+		return ctrl.Result{Requeue: true}, err
 	}
 
-	return ctrl.Result{}, nil
+	return ctrl.Result{RequeueAfter: 10 * time.Second}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
