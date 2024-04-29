@@ -18,6 +18,8 @@ package job
 
 import (
 	"context"
+	"net/http"
+	"os"
 	"time"
 
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -29,6 +31,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	datav1alpha1 "github.com/ArangoGutierrez/k-foundry/apis/v1alpha1"
+	slurmapi "github.com/ArangoGutierrez/k-foundry/openapi"
 )
 
 // Reconciler reconciles a Job object
@@ -52,14 +55,6 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 	// there.
 	log = log.WithValues("clusterName", req.ClusterName)
 
-	// You probably wouldn't need to do this, but if you wanted to list all instances across all logical clusters:
-	var allJobs datav1alpha1.JobList
-	if err := r.Client.List(ctx, &allJobs); err != nil {
-		return ctrl.Result{}, err
-	}
-
-	log.Info("Listed all Jobs across all workspaces", "count", len(allJobs.Items))
-
 	log.Info("Getting Job")
 	var w datav1alpha1.Job
 	if err := r.Client.Get(ctx, req.NamespacedName, &w); err != nil {
@@ -70,15 +65,26 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 		return ctrl.Result{Requeue: true}, err
 	}
 
-	log.Info("Listing all Jobs in the current logical cluster")
-	var list datav1alpha1.JobList
-	if err := r.Client.List(ctx, &list); err != nil {
+	if w.Status.ID != 0 {
+		// Already processed
+		return ctrl.Result{}, nil
+	}
+
+	log.Info("Creating Job", w.Name)
+	jobID, err := createJob(w.Name, w.Spec.Script)
+	if err != nil {
 		return ctrl.Result{}, err
 	}
 
+	//log.Info("Listing all Jobs in the current logical cluster")
+	//var list datav1alpha1.JobList
+	//if err := r.Client.List(ctx, &list); err != nil {
+	//	return ctrl.Result{}, err
+	//}
+	//
 	log.Info("Patching Job status to store total Job count in the current logical cluster")
 	orig := w.DeepCopy()
-	w.Status.ID = len(list.Items)
+	w.Status.ID = int(jobID)
 	if err := r.Client.Status().Patch(ctx, &w, client.MergeFromWithOptions(orig, client.MergeFromWithOptimisticLock{})); err != nil {
 		return ctrl.Result{Requeue: true}, err
 	}
@@ -91,4 +97,59 @@ func (r *Reconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&datav1alpha1.Job{}).
 		Complete(kcp.WithClusterInContext(r))
+}
+
+func createJob(jobName, script string) (int32, error) {
+	cfg := slurmapi.NewConfiguration()
+	cfg.HTTPClient = &http.Client{Timeout: time.Second * 3600}
+	cfg.Scheme = "http"
+	cfg.Host = "10.11.1.6:80"
+
+	client := slurmapi.NewAPIClient(cfg)
+
+	auth := context.WithValue(
+		context.Background(),
+		slurmapi.ContextAPIKeys,
+		map[string]slurmapi.APIKey{
+			"user":  {Key: os.Getenv("LOGNAME")},
+			"token": {Key: os.Getenv("SLURM_JWT")},
+		},
+	)
+
+	pingReq := client.SlurmAPI.SlurmV0040GetPing(auth)
+	_, httpResp, err := pingReq.Execute()
+	if err != nil {
+		// print the http response
+		if httpResp != nil {
+			println(httpResp.Status)
+		}
+		return 0, err
+	}
+
+	nodes := "2"
+	wd := "/tmp/"
+	tasks := int32(8)
+	name := jobName
+	cpuPerTaks := int32(1)
+	job := slurmapi.V0040JobSubmitReq{
+		Job: &slurmapi.V0040JobDescMsg{
+			Tasks:                   &tasks,
+			Name:                    &name,
+			Nodes:                   &nodes,
+			CurrentWorkingDirectory: &wd,
+			CpusPerTask:             &cpuPerTaks,
+			Environment: []string{
+				"PATH=/bin:/usr/bin/:/usr/local/bin/",
+				"LD_LIBRARY_PATH=/lib/:/lib64/:/usr/local/lib",
+			},
+		},
+		Script: &script,
+	}
+
+	j := client.SlurmAPI.SlurmV0040PostJobSubmit(auth).V0040JobSubmitReq(job)
+	r, _, err := j.Execute()
+	if err != nil {
+		return 0, err
+	}
+	return *r.JobId, nil
 }

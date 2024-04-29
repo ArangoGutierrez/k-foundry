@@ -7,4 +7,6 @@ spec:
   script: |
     #!/bin/bash
     echo "Hello, world!"
+    hostname
+    sleep 100
 status: {}

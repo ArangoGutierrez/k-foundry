@@ -32,6 +32,7 @@ import (
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	datav1alpha1 "github.com/ArangoGutierrez/k-foundry/apis/v1alpha1"
 	"github.com/kcp-dev/logicalcluster/v3"
@@ -76,8 +77,8 @@ type Options struct {
 func (o *Options) addFlags(fs *flag.FlagSet) {
 	fs.StringVar(&o.KubeconfigContext, "context", "", "kubeconfig context")
 	fs.StringVar(&o.APIExportName, "api-export-name", "kfoundry.io", "The name of the APIExport.")
-	fs.StringVar(&o.MetricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
-	fs.StringVar(&o.ProbeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
+	fs.StringVar(&o.MetricsAddr, "metrics-bind-address", ":8090", "The address the metric endpoint binds to.")
+	fs.StringVar(&o.ProbeAddr, "health-probe-bind-address", ":8091", "The address the probe endpoint binds to.")
 	fs.BoolVar(&o.EnableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
@@ -100,11 +101,15 @@ func runController(ctx context.Context, opts Options) error {
 	}
 	jobsConfig = rest.AddUserAgent(kcpclienthelper.SetCluster(jobsConfig, jobsCluster), "kcp-controller-runtime-example")
 
+	metrics := metricsserver.Options{
+		BindAddress: opts.MetricsAddr,
+	}
 	ctrlOpts := ctrl.Options{
 		HealthProbeBindAddress: opts.ProbeAddr,
 		LeaderElection:         opts.EnableLeaderElection,
 		LeaderElectionID:       "68a0532d.my.domain",
 		LeaderElectionConfig:   jobsConfig,
+		Metrics:                metrics,
 	}
 
 	// create a manager, either with or without kcp support
