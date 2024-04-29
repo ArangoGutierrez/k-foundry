@@ -26,3 +26,4 @@ bin
 # Tools binaries.
 hack/tools/bin
 
+vendor
